@@ -1,0 +1,23 @@
+<div class="btn btn-default btn-block beatmap">
+    <img class="beatmap-img" src="http://b.ppy.sh/thumb/${beatmap['id']|u}.jpg">
+    <div class="beatmap-stats">
+        <p>${'%.1f'%beatmap['rating']}% <span class="glyphicon glyphicon-thumbs-up"></span></p>
+        <p>${beatmap['fav']|h} <span class="glyphicon glyphicon-heart"></span></p>
+        <p>${beatmap['play']|h} <span class="glyphicon glyphicon-play"></span></p>
+    </div>
+    <p class="beatmap-title">${beatmap['title']|h}</p>
+    <p class="beatmap-shields">
+        % if beatmap['video']:
+            <span class="glyphicon glyphicon-facetime-video"></span>
+        % endif
+        % if beatmap['storyboard']:
+            <span class="glyphicon glyphicon-picture"></span>
+        % endif
+        % for diff in beatmap['diffs']:
+            <img src="/static/difficulty_icon/${diff|u}.png">
+        % endfor
+        by <b>${beatmap['mapper']|h}</b>
+    </p>
+    <p>
+    </p>
+</div>

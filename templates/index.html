@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>osufm</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <script src="/static/bootstrap/js/jquery.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style>
+        body {
+            background-color: #eee;
+            font-family: 'Segoe UI', '微软雅黑', 'Microsoft Yahei', serif;
+            overflow-y: scroll; /* scrollbar auto-hiding will break the smooth animation */
+        }
+        #upper-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: white;
+            box-shadow: 0 0 10px black;
+            z-index: 200;
+        }
+        #upper-bar > .pull-left, #upper-bar > .pull-right {
+            height: 100%;
+        }
+        #upper-bar > .pull-right {
+            padding-right: 1em;
+            padding-left: 1em;
+            line-height: 80px;
+        }
+        #search-box {
+            left: 0;
+            right: 0;
+            margin: auto;
+            max-width: 600px;
+        }
+        #search-box .input-group {
+            padding-top: 10px;
+            padding-bottom: 4px;
+        }
+        #search-box .input-group input {
+            height: 40px;
+            font-size: 25px;
+            line-height: 40px;
+        }
+        .input-group > .input-group-btn > .btn {
+            height: 40px;
+            font-size: 20px;
+        }
+        #search-box label {
+            font-weight: normal;
+            color: #666;
+        }
+        #search-box input[type=checkbox] {
+            vertical-align: middle;
+            position: relative;
+            bottom: 1px;
+            margin: 0;
+        }
+        #maplist {
+            margin-top: 100px;
+            margin-left: 20px;
+            width: calc(50% - 30px);
+        }
+        .beatmap {
+            text-align: left !important;
+            height: 70px;
+        }
+        .beatmap p {
+            margin-bottom: 0;
+        }
+        .beatmap-img {
+            float: left;
+            height: 100%;
+            margin-right: 1em;
+        }
+        .beatmap-title {
+            font-size: 20px;
+        }
+        .beatmap-shields {
+            line-height: 16px;
+        }
+        .beatmap-shields .glyphicon {
+            top: 5px;
+        }
+        .beatmap-stats {
+            float: right;
+            text-align: right;
+        }
+        #desc {
+            position: fixed;
+            top: 100px;
+            bottom: 20px;
+            right: 20px;
+            width: calc(50% - 30px);
+        }
+    </style>
+
+    <script>
+        function show_history() {
+            //todo
+        }
+        function update_search() {
+            $('body').animate({scrollTop: 0},150,'swing');
+            $maplist.fadeOut(300,function() {$maplist.empty().fadeIn(0);});
+            $.ajax({
+                url: '/search',
+                method: 'post',
+                data: JSON.stringify({
+                    term: $('#search-term').val(),
+                    filter_std: $('#filter-std-chk').prop('checked'),
+                    filter_jp: $('#filter-jp-chk').prop('checked'),
+                    filter_ranked: $('#filter-ranked-chk').prop('checked'),
+                    romaj: $('#romaj-chk').prop('checked')
+                }),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json' // for response
+            }).done(function(data) {
+                //todo
+                $('#desc').html(data['desc']);
+                $maplist.promise().done(function() {
+                    for(var i=0;i<data['maplist'].length;i++)
+                        $maplist.append(data['maplist'][i]['html']);
+                });
+            });
+        }
+        $(function() {
+            window.$maplist=$('#maplist')
+            $('#search-term').keypress(function(event) {
+                if(event.keyCode===13/*enter*/)
+                    update_search();
+            });
+        });
+    </script>
+
+</head>
+<body>
+
+<div id="upper-bar">
+    <button type="button" class="btn btn-link pull-left" onclick="show_history()">最近下载</button>
+    <div class="pull-right">
+        <span class="glyphicon glyphicon-user"></span> ${username|h} &nbsp;
+        <a href="/logout" class="btn btn-default">注销</a>
+    </div>
+    <div id="search-box">
+        <div class="input-group">
+            <input type="search" id="search-term" class="form-control" placeholder="搜索谱面" autofocus>
+            <span class="input-group-btn"><button type="button" class="btn btn-default" onclick="update_search()">
+                <span class="glyphicon glyphicon-search"></span>
+            </button></span>
+        </div>
+        <span class="pull-right">
+            <span class="glyphicon glyphicon-cog"></span>
+            <input type="checkbox" id="romaj-chk" checked>
+            <label for="romaj-chk">自动转换为罗马字</label>
+        </span>
+
+        <span class="glyphicon glyphicon-filter"></span>
+        <input type="checkbox" id="filter-std-chk" checked>
+        <label for="filter-std-chk">标准模式</label>
+        <input type="checkbox" id="filter-jp-chk" checked>
+        <label for="filter-jp-chk">日文</label>
+        <input type="checkbox" id="filter-ranked-chk" checked>
+        <label for="filter-ranked-chk">Ranked</label>
+    </div>
+</div>
+
+<div id="maplist"></div>
+<div id="desc"></div>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>登录 - osufm</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <script src="/static/bootstrap/js/jquery.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style>
+        body {
+            font-family: 'Segoe UI', '微软雅黑', 'Microsoft Yahei', serif;
+        }
+    </style>
+
+</head>
+<body><div class="container">
+
+    <div class="page-header"><h1>
+        <span style="color: #ee66aa">osu!</span> flame master <small> by @xmcp</small>
+    </h1></div>
+    <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-primary">
+            <div class="panel-heading">用 Osu 账号登录</div>
+            <div class="panel-body">
+              <form method="post" action="/login">
+                  <div class="input-group">
+                      <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                      <input type="text" name="username" class="form-control" placeholder="用户名" autofocus required>
+                  </div>
+                  <br>
+                  <div class="input-group">
+                      <span class="input-group-addon"><span class="glyphicon glyphicon-leaf"></span></span>
+                      <input type="password" name="password" class="form-control" placeholder="密码">
+                      <span class="input-group-btn"><button type="submit" class="btn btn-primary">
+                          <span class="glyphicon glyphicon-ok"></span>
+                      </button></span>
+                  </div>
+
+              </form>
+            </div>
+        </div>
+        <button type="button" class="btn btn-block btn-link" data-toggle="collapse" data-target="#desc">
+            我为什么要输入我的密码？ 我的账号信息将会被如何使用？
+        </button>
+        <br>
+        <div id="desc" class="collapse"><div class="well well-sm">
+            <p>osufm 记录您的用户名来实现“最近下载”功能，使用您的密码来实现从 osu.ppy.sh 搜索和下载谱面。</p>
+            <p>由于 Osu 的谱面搜索和下载均需登录，您必须向 osufm 提供密码方可正常使用。</p>
+            <p>您的用户名会临时存储于内存中，用于识别您的身份，并将于会话过期后销毁。</p>
+            <p>当您下载歌曲时，包含用户名信息的历史记录将存储于数据库中，用于实现“最近下载”功能。历史记录可以手动清除。</p>
+            <p>您的密码在登录过程中将会发送至 https://osu.ppy.sh 进行身份验证，密码将在登录完成后立即被销毁。</p>
+            <p>osufm 使用 Cookies 保持您在 osu.ppy.sh 的登录状态并以此实现谱面下载，这些 Cookies 将于会话过期后销毁。</p>
+        </div></div>
+    </div>
+
+</div></body>
+</html>
