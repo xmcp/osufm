@@ -6,7 +6,9 @@ Osu Flame Master: The Human Way to Search and Download Osu! Beatmaps
 - Auto kanji-romaji transformation
 - Detailed beatmap statistics
 
-## [Online Demo on Heorku](https://osufm.herokuapp.com)
+## [Online Demo on Heroku](https://osufm.herokuapp.com)
+
+screenshots:
 
 ![screenshot](https://cloud.githubusercontent.com/assets/6646473/18252170/e713c57e-73bf-11e6-84e3-ca33ec16d1bf.png)
 
