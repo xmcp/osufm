@@ -11,6 +11,7 @@
       <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <link rel="stylesheet" href="/static/loaders.css">
     <style>
         body {
             background-color: #eee;
@@ -64,6 +65,10 @@
             bottom: 1px;
             margin: 0;
         }
+        #romaj-label:empty:after {
+            content: '将日文转换为罗马字';
+            opacity: .5;
+        }
         #maplist {
             margin-top: 100px;
             margin-left: 20px;
@@ -78,11 +83,13 @@
         }
         .beatmap-img {
             float: left;
-            height: 100%;
+            height: 56px;
+            width: 75px;
             margin-right: 1em;
         }
         .beatmap-title {
             font-size: 20px;
+            overflow-x: hidden;
         }
         .beatmap-shields {
             line-height: 16px;
@@ -103,40 +110,89 @@
         }
     </style>
 
+    <script src="/static/kuroshiro.min.js"></script>
     <script>
+        kuro_inited=false;
+        last_search_result=[];
+        last_sort_by=null;
+        LOADER='<div class="loader">loading...</div>';
+
         function show_history() {
             //todo
         }
         function update_search() {
+            var node=document.createElement('div'),
+                tit=document.createElement('h1');
+            $(tit).text($search_term.val());
+            $(node).addClass('well').addClass('well-lg').css('text-align','center').append(tit).append(LOADER);
+            $desc.empty().append(node);
+
+            window.last_search_result=[];
             $('body').animate({scrollTop: 0},150,'swing');
             $maplist.fadeOut(300,function() {$maplist.empty().fadeIn(0);});
             $.ajax({
                 url: '/search',
                 method: 'post',
                 data: JSON.stringify({
-                    term: $('#search-term').val(),
+                    term: $search_term.val(),
                     filter_std: $('#filter-std-chk').prop('checked'),
                     filter_jp: $('#filter-jp-chk').prop('checked'),
                     filter_ranked: $('#filter-ranked-chk').prop('checked'),
-                    romaj: $('#romaj-chk').prop('checked')
+                    romaj: $('#romaj-chk').prop('checked')?$romaj_label.data('content'):null
                 }),
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json' // for response
             }).done(function(data) {
-                //todo
-                $('#desc').html(data['desc']);
+                window.last_search_result=data;
+                if(data['error']===401)
+                    location.href='/';
+                $desc.html(data['desc']);
                 $maplist.promise().done(function() {
-                    for(var i=0;i<data['maplist'].length;i++)
-                        $maplist.append(data['maplist'][i]['html']);
+                    sortby('ind');
                 });
             });
         }
-        $(function() {
-            window.$maplist=$('#maplist')
-            $('#search-term').keypress(function(event) {
-                if(event.keyCode===13/*enter*/)
-                    update_search();
+        function sortby(column) {
+            last_search_result['maplist'].sort(function(a,b) {
+                return b[column]-a[column];
             });
+
+            if(last_sort_by)
+                $('#sort-by-'+last_sort_by).removeClass('active');
+            $('#sort-by-'+column).addClass('active');
+            window.last_sort_by=column;
+
+            $maplist.empty();
+            for(var i=0;i<last_search_result['maplist'].length;i++)
+                $maplist.append(last_search_result['maplist'][i]['html']);
+        }
+        $(function() {
+            window.$maplist=$('#maplist');
+            window.$search_term=$('#search-term');
+            window.$romaj_label=$('#romaj-label');
+            window.$desc=$('#desc');
+
+            kuroshiro.init({dicPath:'http://www.hexenq.com/kuroshiro/demo/bower_components/kuroshiro/dist/dict'},function(){
+                window.kuro_inited=true;
+                $romaj_label.text('');
+            });
+
+            $search_term
+                .keypress(function(event) {
+                    if(event.keyCode===13/*enter*/)
+                        update_search();
+                })
+                .keyup(function() {
+                    setTimeout(function() {
+                        if(kuro_inited) {
+                            var romaj=kuroshiro.convert($search_term.val(),{to:'romaji',mode:'spaced'});
+                            if(romaj.replace(/ /g,'')!==$search_term.val().replace(/ /g,''))
+                                $romaj_label.data('content',romaj).text(romaj);
+                            else
+                                $romaj_label.data('content',null).text('');
+                        }
+                    },1);
+                });
         });
     </script>
 
@@ -157,9 +213,9 @@
             </button></span>
         </div>
         <span class="pull-right">
-            <span class="glyphicon glyphicon-cog"></span>
+            <span class="glyphicon glyphicon-book"></span>
             <input type="checkbox" id="romaj-chk" checked>
-            <label for="romaj-chk">自动转换为罗马字</label>
+            <label for="romaj-chk" id="romaj-label" data-content="">正在加载词库……</label>
         </span>
 
         <span class="glyphicon glyphicon-filter"></span>

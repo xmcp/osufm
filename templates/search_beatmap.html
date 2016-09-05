@@ -1,9 +1,9 @@
 <div class="btn btn-default btn-block beatmap">
     <img class="beatmap-img" src="http://b.ppy.sh/thumb/${beatmap['id']|u}.jpg">
     <div class="beatmap-stats">
-        <p>${'%.1f'%beatmap['rating']}% <span class="glyphicon glyphicon-thumbs-up"></span></p>
-        <p>${beatmap['fav']|h} <span class="glyphicon glyphicon-heart"></span></p>
-        <p>${beatmap['play']|h} <span class="glyphicon glyphicon-play"></span></p>
+        <p>${'%.1f'%beatmap['rating'] if beatmap['rating']>0 else '--.-'}% <span class="glyphicon glyphicon-thumbs-up"></span></p>
+        <p>${beatmap['fav'] if beatmap['fav']!=-1 else '--'|h} <span class="glyphicon glyphicon-heart"></span></p>
+        <p>${beatmap['play'] if beatmap['play']!=-1 else '--'|h} <span class="glyphicon glyphicon-play"></span></p>
     </div>
     <p class="beatmap-title">${beatmap['title']|h}</p>
     <p class="beatmap-shields">

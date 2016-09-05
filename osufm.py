@@ -1,4 +1,6 @@
 #coding=utf-8
+from collections import OrderedDict
+
 import cherrypy
 from mako.template import Template
 import os
@@ -48,25 +50,42 @@ class Website:
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
     def search(self):
+        if 'username' not in cherrypy.session:
+            return {'error':401}
+
         term=str(cherrypy.request.json['term'])
         filter_std=cherrypy.request.json['filter_std']
         filter_jp=cherrypy.request.json['filter_jp']
         filter_ranked=cherrypy.request.json['filter_ranked']
         romaj=cherrypy.request.json['romaj']
-        res=cherrypy.session['s'].get('http://osu.ppy.sh/p/beatmaplist',params=dict(
-            q=term,
-            m=0 if filter_std else -1,
-            la=3 if filter_jp else 0,
-            r=0 if filter_ranked else 4,
-        ))
-        res.raise_for_status()
-        count,beatmaps=result_parser.parse(res.text)
+
+        def fetch_item(t):
+            res=cherrypy.session['s'].get('http://osu.ppy.sh/p/beatmaplist',params=dict(
+                q=t,
+                m=0 if filter_std else -1,
+                la=3 if filter_jp else 0,
+                r=0 if filter_ranked else 4,
+            ))
+            res.raise_for_status()
+            return result_parser.parse(res.text)
+
+        count,beatmaps=fetch_item(term)
+
+        if romaj:
+            assert isinstance(romaj,str)
+            rcount,rbeatmaps=fetch_item(romaj)
+        else:
+            rcount=None
+            rbeatmaps=OrderedDict()
+
+        beatmaps.update(rbeatmaps)
         bmap_template=template('search_beatmap')
-        for beatmap in beatmaps:
+        for ind,beatmap in enumerate(beatmaps.values()):
             beatmap['html']=bmap_template.render(beatmap=beatmap)
+            beatmap['ind']=-ind #better sorting
         return {
-            'desc': template('search_desc').render(term=term,count=count),
-            'maplist': beatmaps,
+            'desc': template('search_desc').render(term=term,count=count,rterm=romaj,rcount=rcount,showing=len(beatmaps)),
+            'maplist': list(beatmaps.values()),
         }
 
 

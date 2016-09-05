@@ -1,4 +1,27 @@
 <div class="well well-lg" style="text-align: center">
-    <h1>${term|h}</h1>
+    <h1 style="margin-bottom:0">${term|h}</h1>
     <p><small>${'很多' if count==-1 else count|h} 个结果</small></p>
+    % if rcount is not None:
+        <h3 style="margin-bottom:0">${rterm|h}</h3>
+        <p><small>${'很多' if rcount==-1 else rcount|h} 个结果</small></p>
+    % endif
+    % if count+(rcount or 0)!=showing:
+        <br>
+        <p>显示前 ${showing|h} 个</p>
+    % endif
+    <br>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default" id="sort-by-ind" onclick="sortby('ind')">
+            <span class="glyphicon glyphicon-stats"></span> 综合
+        </button>
+        <button type="button" class="btn btn-default" id="sort-by-rating" onclick="sortby('rating')">
+            <span class="glyphicon glyphicon-thumbs-up"></span> 好评
+        </button>
+        <button type="button" class="btn btn-default" id="sort-by-fav" onclick="sortby('fav')">
+            <span class="glyphicon glyphicon-heart"></span> 收藏
+        </button>
+        <button type="button" class="btn btn-default" id="sort-by-play" onclick="sortby('play')">
+            <span class="glyphicon glyphicon-play"></span> 点击
+        </button>
+    </div>
 </div>
