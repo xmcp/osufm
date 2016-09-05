@@ -1,5 +1,4 @@
 #coding=utf-8
-from collections import OrderedDict
 
 import cherrypy
 from mako.template import Template
@@ -8,8 +7,10 @@ import time
 import threading
 import requests
 import result_parser
+from collections import OrderedDict
 
 login_lock=threading.Lock()
+APIKEY=os.environ.get('OSU_APIKEY')
 
 def template(name,**kwargs):
     return Template(filename='templates/%s.html'%name,input_encoding='utf-8')
@@ -88,6 +89,50 @@ class Website:
             'maplist': list(beatmaps.values()),
         }
 
+    @cherrypy.expose()
+    def detail(self,beatmapsetid):
+        if 'username' not in cherrypy.session:
+            return 'Please log in first. <script>top.location.href="/";</script>'
+
+        res=requests.get(
+            'https://osu.ppy.sh/api/get_beatmaps',
+            params=dict(
+                k=APIKEY,
+                s=int(beatmapsetid),
+            )
+        )
+        res.raise_for_status()
+        beatmaps=res.json()
+
+        if beatmaps:
+            return template('beatmap_detail').render(beatmaps=beatmaps)
+        else:
+            return 'no result.' #todo: improve
+
+    @cherrypy.expose()
+    def down(self,beatmapsetid,video=False):
+        if 'username' not in cherrypy.session:
+            raise cherrypy.HTTPRedirect('/')
+
+        res=cherrypy.session['s'].get('https://osu.ppy.sh/d/%d%s'%(int(beatmapsetid),'' if video else 'n'),stream=True)
+        res.raise_for_status()
+
+        cherrypy.response.headers['Content-Type']='application/x-download'
+        cherrypy.response.headers['Content-Disposition']='attachment; filename="%d%s.osz"'%(int(beatmapsetid),'_video' if video else '')
+
+        def addheader(k):
+            if k in res.headers:
+                cherrypy.response.headers[k]=res.headers[k]
+        addheader('Content-Length')
+        addheader('Content-Encoding')
+
+        def extract():
+            yield from res.raw.stream(64*1024,decode_content=False)
+        return extract()
+
+
+if APIKEY is None:
+    print('WARNING: OSU_APIKEY not set.')
 
 cherrypy.quickstart(Website(),'/',{
     'global': {
@@ -106,5 +151,9 @@ cherrypy.quickstart(Website(),'/',{
         'tools.response_headers.headers': [
             ('Cache-Control','max-age=86400'),
         ],
+    },
+    '/down': {
+        'response.stream': True,
+        'tools.gzip.on': False,
     }
 })

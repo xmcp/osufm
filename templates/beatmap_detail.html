@@ -1,0 +1,77 @@
+<%!
+    import math
+    approve_meaning={
+        '3': 'Qualified',
+        '2': 'Approved',
+        '1': 'Ranked',
+        '0': 'Pending',
+        '-1': 'WIP',
+        '-2': 'Graveyard',
+    }
+
+    def proctime(t):
+        t=int(t)
+        return '%d:%2d'%(t//60,t%60)
+
+    def proccount(c):
+        c=float(c)
+        if not c:
+            return '0'
+        format='%6.2f %s'
+        prefixes=' KMGTPEZY'
+
+        power=int(math.log(c, 1000))
+        scaled=c/1000.**power
+        return format%(scaled, prefixes[power])
+%>
+<h3 style="margin-top:0">
+    <span class="glyphicon glyphicon-time"></span>
+    <b>${proctime(max([b['total_length'] for b in beatmaps]))|h}</b>
+    &nbsp;
+    <span class="text-success">
+        <% approve_level=max([b['approved'] for b in beatmaps]) %>
+        ${approve_meaning.get(approve_level,'Unknown')|h} (${approve_level|h})
+    </span>
+</h3>
+<div class="page-header" style="margin-top:0"><h1>
+    ${beatmaps[0]['title']|h} &nbsp; <small>mapped by ${beatmaps[0]['creator']|h}</small>
+</h1></div>
+<p>
+    artist: <b>${beatmaps[0]['artist'] or '--'|h}</b>
+    /
+    source: <b>${beatmaps[0]['source'] or '--'|h}</b>
+    /
+    % for tag in beatmaps[0]['tags'].split(' '):
+        <span class="label label-default">${tag|h}</span>
+    % endfor
+</p>
+<br>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>版本</th>
+            <th>难度</th>
+            <th>通过 / 播放</th>
+            <th>CS</th>
+            <th>OD</th>
+            <th>AR</th>
+            <th>HP</th>
+            <th>Combo</th>
+        </tr>
+    </thead>
+    <tbody>
+        ## todo: showing game mode
+        % for beatmap in sorted(beatmaps,key=lambda b:float(b['difficultyrating'])):
+            <tr>
+                <td>${beatmap['version']|h}</td>
+                <td>${'%.1f'%float(beatmap['difficultyrating'])|h}</td>
+                <td>${proccount(beatmap['passcount'])|h} / <b>${proccount(beatmap['playcount'])|h}</b></td>
+                <td>${beatmap['diff_size']|h}</td>
+                <td>${beatmap['diff_overall']|h}</td>
+                <td>${beatmap['diff_approach']|h}</td>
+                <td>${beatmap['diff_drain']|h}</td>
+                <td>${beatmap['max_combo']}</td>
+            </tr>
+        % endfor
+    </tbody>
+</table>

@@ -33,22 +33,22 @@
         <div class="panel panel-primary">
             <div class="panel-heading">用 Osu 账号登录</div>
             <div class="panel-body">
-              <form method="post" action="/login">
-                  <div class="input-group">
-                      <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                      <input type="text" name="username" class="form-control" placeholder="用户名" autofocus required>
-                  </div>
-                  <br>
-                  <div class="input-group">
-                      <span class="input-group-addon"><span class="glyphicon glyphicon-leaf"></span></span>
-                      <input type="password" name="password" class="form-control" placeholder="密码">
+                <form method="post" action="/login">
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                        <input type="text" name="username" class="form-control" placeholder="用户名" autofocus required>
+                    </div>
+                    <br>
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-leaf"></span></span>
+                        <input type="password" name="password" class="form-control" placeholder="密码">
                       <span class="input-group-btn"><button type="submit" class="btn btn-primary">
                           <span class="glyphicon glyphicon-ok"></span>
                       </button></span>
-                  </div>
-
-              </form>
+                    </div>
+                </form>
             </div>
+            <div class="panel-footer">登录将视为您同意我们合理使用此 Osu 账号，详情见下方链接。</div>
         </div>
         <button type="button" class="btn btn-block btn-link" data-toggle="collapse" data-target="#desc">
             我为什么要输入我的密码？ 我的账号信息将会被如何使用？
@@ -62,6 +62,7 @@
             <p>您的密码在登录过程中将会发送至 https://osu.ppy.sh 进行身份验证，密码将在登录完成后立即被销毁。</p>
             <p>osufm 使用 Cookies 保持您在 osu.ppy.sh 的登录状态并以此实现谱面下载，这些 Cookies 将于会话过期后销毁。</p>
         </div></div>
+        <a href="https://github.com/xmcp/osufm" target="_blank" class="btn btn-block btn-link">xmcp/osufm - GitHub</a>
     </div>
 
 </div></body>

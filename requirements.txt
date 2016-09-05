@@ -1,0 +1,4 @@
+cherrypy
+mako
+requests
+pyquery

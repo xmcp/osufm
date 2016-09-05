@@ -115,6 +115,7 @@
         kuro_inited=false;
         last_search_result=[];
         last_sort_by=null;
+        last_active_btn=null;
         LOADER='<div class="loader">loading...</div>';
 
         function show_history() {
@@ -165,6 +166,55 @@
             $maplist.empty();
             for(var i=0;i<last_search_result['maplist'].length;i++)
                 $maplist.append(last_search_result['maplist'][i]['html']);
+        }
+        function detail(mapsetid,with_video) {
+            if(last_active_btn)
+                last_active_btn.removeClass('active');
+            window.last_active_btn=$('#beatmap-btn-'+mapsetid).addClass('active');
+
+            var panel=document.createElement('div'),
+                panel_head=document.createElement('div'),
+                panel_body=document.createElement('div'),
+                map_link=document.createElement('a'),
+                down_link=document.createElement('a'),
+                down_video_link=document.createElement('a');
+
+            $(map_link)
+                .attr('href','https://osu.ppy.sh/s/'+encodeURIComponent(mapsetid))
+                .attr('target','_blank')
+                .addClass('btn')
+                .addClass('btn-link')
+                .addClass('pull-right')
+                .text('#'+mapsetid);
+            $(down_link)
+                .attr('href','/down/'+encodeURIComponent(mapsetid))
+                .attr('target','_blank')
+                .addClass('btn')
+                .addClass('btn-primary')
+                .html('<span class="glyphicon glyphicon-cloud-download"></span> 下载');
+            $(down_video_link)
+                .attr('href','/down/'+encodeURIComponent(mapsetid)+'/video')
+                .attr('target','_blank')
+                .addClass('btn')
+                .addClass('btn-default')
+                .css('margin-left','.5em')
+                .html('<span class="glyphicon glyphicon-facetime-video"></span> 包括视频');
+            $(panel_body)
+                .addClass('panel-body')
+                .html('<div class="loader">loading...</div>')
+                .load('/detail/'+encodeURIComponent(mapsetid));
+            $(panel_head)
+                .addClass('panel-heading')
+                .append(map_link)
+                .append(down_link);
+            if(with_video)
+                $(panel_head).append(down_video_link);
+            $(panel)
+                .addClass('panel')
+                .addClass('panel-default')
+                .append(panel_head)
+                .append(panel_body);
+            $desc.empty().append(panel);
         }
         $(function() {
             window.$maplist=$('#maplist');

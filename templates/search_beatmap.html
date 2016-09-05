@@ -1,4 +1,5 @@
-<div class="btn btn-default btn-block beatmap">
+<div class="btn btn-default btn-block beatmap" ${'disabled' if beatmap['id']<0 else ''} id="beatmap-btn-${beatmap['id']|h}"
+        onclick="detail(${beatmap['id']|h},${'true' if beatmap['video'] else 'false'})">
     <img class="beatmap-img" src="http://b.ppy.sh/thumb/${beatmap['id']|u}.jpg">
     <div class="beatmap-stats">
         <p>${'%.1f'%beatmap['rating'] if beatmap['rating']>0 else '--.-'}% <span class="glyphicon glyphicon-thumbs-up"></span></p>
